@@ -29,7 +29,7 @@ while not video.isOpened():  # While v4l2 device haven't been opened by ffmpeg
 
 while True:
     received, frame = video.read()  # Reads and waits for next captured frame
-    # squared = cv.resize(received, (320, 180)) Doesn't work for now
+    squared = cv.resize(frame, (16, 9))
 
     if not received:  # No longer signal received from device, stops
         print("No signal from video stream.")
@@ -37,6 +37,8 @@ while True:
 
     # Shows current captured frame to screen
     cv.imshow("Screen capture", frame)
+
+    print(squared)
 
     if cv.waitKey(framerate) == ord("q"):  # Leaves program when "q" is pressed
         break
