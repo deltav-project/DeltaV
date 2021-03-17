@@ -36,7 +36,7 @@ while True:
         break
 
     # Shows current captured frame to screen
-    cv.imshow("Screen capture", received)
+    cv.imshow("Screen capture", frame)
 
     if cv.waitKey(framerate) == ord("q"):  # Leaves program when "q" is pressed
         break
