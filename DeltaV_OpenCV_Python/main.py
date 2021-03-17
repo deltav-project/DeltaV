@@ -3,21 +3,16 @@
 import numpy as np
 import cv2 as cv
 from sys import argv
-import ffmpeg
 
 
 # Reads /dev/video device index from first command line argument
 dev_index = int(argv[1])
 # Framerate is 1000ms / (second command line argument)
 framerate = 1000 // int(argv[2])
-
-# Starts ffmpeg background process
-# Streaming from ":0.0" (for currently running X11 display server) with x11grab
-# To "/dev/video{device_index}" with v4l2
-streaming = ffmpeg \
-    .input(":0.0", f="x11grab", s="1920x1080", r=framerate) \
-    .output(f"/dev/video{dev_index}", f="v4l2").run_async()
-
+# Width from 3rd argument
+width = int(argv[3])
+# Height for 4th argument
+height = int(argv[4])
 
 # First try to open video capture from v4l2 device /dev/video{device}
 video = cv.VideoCapture(dev_index)
@@ -29,19 +24,10 @@ while not video.isOpened():  # While v4l2 device haven't been opened by ffmpeg
 
 while True:
     received, frame = video.read()  # Reads and waits for next captured frame
-    squared = cv.resize(frame, (16, 9))
+    squared = cv.resize(frame, (width, height))
 
     if not received:  # No longer signal received from device, stops
         print("No signal from video stream.")
         break
 
-    # Shows current captured frame to screen
-    cv.imshow("Screen capture", frame)
-
     print(squared)
-
-    if cv.waitKey(framerate) == ord("q"):  # Leaves program when "q" is pressed
-        break
-
-cv.destroyAllWindows()  # OpenCV windows gone, end of program
-streaming.terminate()  # Stops ffmpeg background process (sending SIGTERM)
