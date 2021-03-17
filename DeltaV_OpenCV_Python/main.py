@@ -15,12 +15,17 @@ width = int(argv[3])
 height = int(argv[4])
 
 # First try to open video capture from v4l2 device /dev/video{device}
+print("Creating video capture...")
 video = cv.VideoCapture(dev_index)
+print("Created video capture:", video)
 
 # As ffmpeg is background process, it might not be running at this point, so
 # v4l2 device may not be open.
 while not video.isOpened():  # While v4l2 device haven't been opened by ffmpeg
+    print("Opening capture...")
     video.open(dev_index)  # Tries again to get video capture from device
+
+print("Opened.")
 
 while True:
     received, frame = video.read()  # Reads and waits for next captured frame
