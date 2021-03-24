@@ -14,9 +14,13 @@ width = int(argv[3])
 # Height for 4th argument
 height = int(argv[4])
 
+framerate_logging = "--show-fps" in argv  # show-fps option enable framerate informations logging
+
 unlimited_framerate = framerate == 0  # 0fps enable unlimited fps mode
 if not unlimited_framerate:  # Avoid ArithmeticError with div by 0
     framerate_delay_s = 1 / framerate  # Delay expected between each frames (main loop iteration)
+else:
+    framerate_delay_s = -1  # Time remaining before next frame checks for positive delay, set to negative
 
 # First try to open video capture from camera device /dev/video{device}
 print("Creating video capture...")
@@ -29,8 +33,18 @@ while not video.isOpened():  # While camera is device is not opened
 
 print("Opened.")
 
+last_frame = time.time()  # First frame will have null duration
+
 while True:
     image_handling_begin = time.time()  # Save image handling begin timestamp
+
+    if framerate_logging:  # show-fps option enable frame informations
+        duration = image_handling_begin - last_frame
+
+        if duration != 0:  # Don't care about first frame (null duration)
+            print(f"Estimate framerate: {1 / duration}fps /// Last frame duration: {duration}s")
+
+        last_frame = image_handling_begin
 
     received, frame = video.read()  # Reads and waits for next captured frame
     if not received:  # No longer signal received from device, stops
@@ -51,6 +65,7 @@ while True:
         array_left_pixels, array_right_pixels, array_bottom_pixels = array_top_pixels, array_top_pixels, array_top_pixels
 
     image_handling_duration = time.time() - image_handling_begin  # Save image handling duration
+    remaining_frame_delay_s = framerate_delay_s - image_handling_duration  # Remaining time to wait is expected time minus time spent to handle image
 
-    if not unlimited_framerate:  # Wait if and only if framerate should be limited
-        time.sleep(framerate_delay_s - image_handling_duration)  # Wait time remaining before next frame should be handled
+    if not unlimited_framerate and remaining_frame_delay_s > 0:  # Wait if and only if framerate should be limited
+        time.sleep(remaining_frame_delay_s)  # Wait time remaining before next frame should be handled
