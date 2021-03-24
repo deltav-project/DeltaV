@@ -44,10 +44,4 @@ while True:
         array_top_pixels = frame_resized[0]
         array_left_pixels, array_right_pixels, array_bottom_pixels = array_top_pixels, array_top_pixels, array_top_pixels
 
-    # printing some info in the console
-    print("pixels du haut :", array_top_pixels)
-    print("pixels de gauche :", array_left_pixels)
-    print("pixels de droite :", array_right_pixels)
-    print("pixels du bas :", array_bottom_pixels)
-
     time.sleep(1/framerate)
