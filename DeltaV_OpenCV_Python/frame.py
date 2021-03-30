@@ -90,7 +90,7 @@ class FrameResizer:
             on_frame(resized_frame_borders)
 
             frame_handling_duration = time() - frame_handling_begin  # Time took in seconds to handle current frame
-            remaining_before_next = self.frame_delay_s - frame_handling_begin  # Calculate remaing seconds before next frame
+            remaining_before_next = self.frame_delay_s - frame_handling_duration  # Calculate remaing seconds before next frame
 
-            if remaining_before_next > 0:  # Don't sleep if late for next frame
+            if self.limited_framerate and remaining_before_next > 0:  # Don't sleep if late for next frame
                 sleep(remaining_before_next)
