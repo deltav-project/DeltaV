@@ -3,7 +3,7 @@
 from frame import FrameResizer
 from sys import argv
 import board
-from neopixel import NeoPixel
+from neopixel import NeoPixel, BGR
 
 
 # Reads /dev/video device index from first command line argument
@@ -32,12 +32,12 @@ class LedstripUpdater:
         """Take top border from given arrays to adjust ledstrip LEDs, filling with black if required"""
 
         top_array = borders[0]
-        leds_to_color = max(top_array, self.ledstrip.n())  # Color LED while there is still LEDs and there is still pixel to show
+        leds_to_color = max(len(top_array), self.ledstrip.n)  # Color LED while there is still LEDs and there is still pixel to show
 
         for i in range(leds_to_color):
             self.ledstrip[i] = top_array[i]
 
-        for i in range(leds_to_color, self.ledstrip.n()):  # Color remaining LEDS (if any) in black
+        for i in range(leds_to_color, self.ledstrip.n):  # Color remaining LEDS (if any) in black
             self.ledstrip[i] = (0, 0, 0)
 
 
@@ -52,7 +52,7 @@ def do_nothing(borders):  # Don't do anything on resized frame
 
 pin_value = getattr(board, pin)  # Get pin variable from board module depending on pin id argument
 
-with NeoPixel(pin_value, leds) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
+with NeoPixel(pin_value, leds, pixel_order="BGR") as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
 
     resizer = FrameResizer(dev_index, framerate, width, height)
