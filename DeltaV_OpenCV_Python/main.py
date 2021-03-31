@@ -3,7 +3,7 @@
 from frame import FrameResizer
 from sys import argv
 import board
-from neopixel import NeoPixel
+from neopixel import NeoPixel, RGB
 
 
 # Reads /dev/video device index from first command line argument
@@ -52,7 +52,7 @@ def do_nothing(borders):  # Don't do anything on resized frame
 
 pin_value = getattr(board, pin)  # Get pin variable from board module depending on pin id argument
 
-with NeoPixel(pin_value, leds, pixel_order="BRG") as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
+with NeoPixel(pin_value, leds, pixel_order=RGB) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
 
     resizer = FrameResizer(dev_index, framerate, width, height)

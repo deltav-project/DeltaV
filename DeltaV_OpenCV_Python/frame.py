@@ -60,6 +60,10 @@ class FrameResizer:
             array_top_pixels = resized_frame[0]
             array_left_pixels, array_right_pixels, array_bottom_pixels = array_top_pixels, array_top_pixels, array_top_pixels
 
+        for pixels_array in [array_top_pixels, array_bottom_pixels, array_left_pixels, array_right_pixels]:
+            for pixel in pixels_array:
+                pixel[0], pixel[2] = pixel[2], pixel[0]
+
         return array_top_pixels, array_bottom_pixels, array_left_pixels, array_right_pixels
 
     def start_resize(self, on_frame: "function", framerate_logging: bool = False):
