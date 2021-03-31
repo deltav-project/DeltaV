@@ -60,9 +60,39 @@ class FrameResizer:
             array_top_pixels = resized_frame[0]
             array_left_pixels, array_right_pixels, array_bottom_pixels = array_top_pixels, array_top_pixels, array_top_pixels
 
-        for pixels_array in [array_top_pixels, array_bottom_pixels, array_left_pixels, array_right_pixels]:
-            for pixel in pixels_array:
-                pixel[0], pixel[2] = pixel[2], pixel[0]
+        c_array_top_pixels = np.zeros((len(array_top_pixels), 3), dtype=np.uint8)
+        for i in range(0, width):
+            pixel = array_top_pixels[i]
+
+            c_array_top_pixels[i][0] = pixel[2]
+            c_array_top_pixels[i][1] = pixel[1]
+            c_array_top_pixels[i][2] = pixel[0]
+
+        c_array_bottom_pixels = np.zeros((len(array_bottom_pixels), 3), dtype=np.uint8)
+        for i in range(0, width):
+            pixel = array_bottom_pixels[i]
+
+            c_array_bottom_pixels[i][0] = pixel[2]
+            c_array_bottom_pixels[i][1] = pixel[1]
+            c_array_bottom_pixels[i][2] = pixel[0]
+
+        c_array_left_pixels = np.zeros((len(array_left_pixels), 3), dtype=np.uint8)
+        for i in range(0, width):
+            pixel = array_left_pixels[i]
+
+            c_array_left_pixels[i][0] = pixel[2]
+            c_array_left_pixels[i][1] = pixel[1]
+            c_array_left_pixels[i][2] = pixel[0]
+
+        c_array_right_pixels = np.zeros((len(array_right_pixels), 3), dtype=np.uint8)
+        for i in range(0, width):
+            pixel = array_right_pixels[i]
+
+            c_array_right_pixels[i][0] = pixel[2]
+            c_array_right_pixels[i][1] = pixel[1]
+            c_array_right_pixels[i][2] = pixel[0]
+
+        return c_array_top_pixels, c_array_bottom_pixels, c_array_left_pixels, c_array_right_pixels
 
         return array_top_pixels, array_bottom_pixels, array_left_pixels, array_right_pixels
 
