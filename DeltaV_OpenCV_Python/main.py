@@ -3,7 +3,7 @@
 from frame import FrameResizer
 from sys import argv
 import board
-from neopixel import NeoPixel, BGR
+from neopixel import NeoPixel
 
 
 # Reads /dev/video device index from first command line argument
