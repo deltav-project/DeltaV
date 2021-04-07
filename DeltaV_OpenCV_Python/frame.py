@@ -3,7 +3,19 @@ import cv2 as cv
 from time import time, sleep
 
 
-def to_rgb(top: np.arr)
+def to_rgb(pixels_array):
+    """Copies given OpenCV BGR pixels array to RGB pixels array"""
+
+    # Creates RGB pixel arrays with same size than original given array
+    rgb_pixels_array = np.zeros((len(pixels_array), 3), dtype=np.uint8)
+
+    # For each pixel in original array
+    for i in range(len(pixels_array)):
+        (blue, green, red) = *pixels_array[i]  # Retrieves colors provided by OpenCV using BGR order
+
+        rgb_pixels_array[i] = np.array([red, green, blue])  # Copies to new array using RGB order
+
+    return rgb_pixels_array
 
 
 class FrameResizer:
@@ -43,7 +55,7 @@ class FrameResizer:
         print("Video capture stream open.")
 
     def get_borders(self, resized_frame):
-        """Retrieves top, bottom, left and right borders for given resized frame"""
+        """Retrieves top, bottom, left and right borders for given resized frame, using RGB order"""
 
         width, height = self.resized_frame_dims  # Get resized frame configuration dimensions, first value is w, second value is width
 
@@ -63,39 +75,8 @@ class FrameResizer:
             array_top_pixels = resized_frame[0]
             array_left_pixels, array_right_pixels, array_bottom_pixels = array_top_pixels, array_top_pixels, array_top_pixels
 
-        c_array_top_pixels = np.zeros((len(array_top_pixels), 3), dtype=np.uint8)
-        for i in range(0, width):
-            pixel = array_top_pixels[i]
-
-            c_array_top_pixels[i][0] = pixel[2]
-            c_array_top_pixels[i][1] = pixel[1]
-            c_array_top_pixels[i][2] = pixel[0]
-
-        c_array_bottom_pixels = np.zeros((len(array_bottom_pixels), 3), dtype=np.uint8)
-        for i in range(0, height - 2):
-            pixel = array_bottom_pixels[i]
-
-            c_array_bottom_pixels[i][0] = pixel[2]
-            c_array_bottom_pixels[i][1] = pixel[1]
-            c_array_bottom_pixels[i][2] = pixel[0]
-
-        c_array_left_pixels = np.zeros((len(array_left_pixels), 3), dtype=np.uint8)
-        for i in range(0, height - 2):
-            pixel = array_left_pixels[i]
-
-            c_array_left_pixels[i][0] = pixel[2]
-            c_array_left_pixels[i][1] = pixel[1]
-            c_array_left_pixels[i][2] = pixel[0]
-
-        c_array_right_pixels = np.zeros((len(array_right_pixels), 3), dtype=np.uint8)
-        for i in range(0, width):
-            pixel = array_right_pixels[i]
-
-            c_array_right_pixels[i][0] = pixel[2]
-            c_array_right_pixels[i][1] = pixel[1]
-            c_array_right_pixels[i][2] = pixel[0]
-
-        return c_array_top_pixels, c_array_bottom_pixels, c_array_left_pixels, c_array_right_pixels
+        # Converts each border pixels array to RGB
+        return to_rgb(array_top_pixels), to_rgb(array_bottom_pixels), to_rgb(array_left_pixels), to_rgb(array_right_pixels)
 
     def start_resize(self, on_frame: "function", framerate_logging: bool = False):
         """Resizes each received frame from video capture stream.
