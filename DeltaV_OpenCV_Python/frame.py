@@ -11,7 +11,7 @@ def to_rgb(pixels_array):
 
     # For each pixel in original array
     for i in range(len(pixels_array)):
-        (blue, green, red) = *pixels_array[i]  # Retrieves colors provided by OpenCV using BGR order
+        (blue, green, red) = pixels_array[i]  # Retrieves colors provided by OpenCV using BGR order
 
         rgb_pixels_array[i] = np.array([red, green, blue])  # Copies to new array using RGB order
 
