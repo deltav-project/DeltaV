@@ -32,7 +32,7 @@ class LedstripUpdater:
         """Take top border from given arrays to adjust ledstrip LEDs, filling with black if required"""
 
         top_array = borders[0]
-        leds_to_color = max(len(top_array), self.ledstrip.n)  # Color LED while there is still LEDs and there is still pixel to show
+        leds_to_color = min(len(top_array), self.ledstrip.n)  # Color LED while there is still LEDs and there is still pixel to show
 
         for i in range(leds_to_color):
             self.ledstrip[i] = top_array[i]
