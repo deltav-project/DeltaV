@@ -3,6 +3,9 @@ import cv2 as cv
 from time import time, sleep
 
 
+def to_rgb(top: np.arr)
+
+
 class FrameResizer:
     """Open a VideoCapture stream, then read and resize each frame, calls given handler for each received frame"""
 
@@ -69,7 +72,7 @@ class FrameResizer:
             c_array_top_pixels[i][2] = pixel[0]
 
         c_array_bottom_pixels = np.zeros((len(array_bottom_pixels), 3), dtype=np.uint8)
-        for i in range(0, width):
+        for i in range(0, height - 2):
             pixel = array_bottom_pixels[i]
 
             c_array_bottom_pixels[i][0] = pixel[2]
@@ -77,7 +80,7 @@ class FrameResizer:
             c_array_bottom_pixels[i][2] = pixel[0]
 
         c_array_left_pixels = np.zeros((len(array_left_pixels), 3), dtype=np.uint8)
-        for i in range(0, width):
+        for i in range(0, height - 2):
             pixel = array_left_pixels[i]
 
             c_array_left_pixels[i][0] = pixel[2]
@@ -93,8 +96,6 @@ class FrameResizer:
             c_array_right_pixels[i][2] = pixel[0]
 
         return c_array_top_pixels, c_array_bottom_pixels, c_array_left_pixels, c_array_right_pixels
-
-        return array_top_pixels, array_bottom_pixels, array_left_pixels, array_right_pixels
 
     def start_resize(self, on_frame: "function", framerate_logging: bool = False):
         """Resizes each received frame from video capture stream.
