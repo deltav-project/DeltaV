@@ -14,10 +14,8 @@ framerate = int(argv[2])
 width = int(argv[3])
 # Height for 4th argument
 height = int(argv[4])
-# Number of leds on plugged led strip
-leds = int(argv[5])
 # Get pin id for plugged led strip
-pin = argv[6]
+pin = argv[5]
 
 framerate_logging = "--show-fps" in argv  # show-fps option enable framerate informations logging
 
@@ -28,17 +26,26 @@ class LedstripUpdater:
     def __init__(self, ledstrip: NeoPixel):
         self.ledstrip = ledstrip
 
+    def updateBorder(self, border, leds_array_begin: int): int:
+        """Takes given border and draw LEDS from leds_array_begin until there is no more color in border, or no more LEDs to update"""
+
+        leds_count = self.ledstrip.n
+        border_len = len(border)
+        color_i = 0
+
+        while color_i < border_len and leds_array_begin + color_i < leds_count:
+            self.ledstrip[leds_array_begin + color_i] = border[color_i]
+            color_i += 1
+
     def __call__(self, borders):
         """Take top border from given arrays to adjust ledstrip LEDs, filling with black if required"""
 
-        top_array = borders[0]
-        leds_to_color = min(len(top_array), self.ledstrip.n)  # Color LED while there is still LEDs and there is still pixel to show
+        (top, bottom, left, right) = borders
 
-        for i in range(leds_to_color):
-            self.ledstrip[i] = top_array[i]
-
-        for i in range(leds_to_color, self.ledstrip.n):  # Color remaining LEDS (if any) in black
-            self.ledstrip[i] = (0, 0, 0)
+        self.updateBorder(0, top)
+        self.updateBorder(16, right)
+        self.updateBorder(25, bottom)
+        self.updateBorder(41, left)
 
 
 def print_borders(borders):  # Prints resized frame borders
