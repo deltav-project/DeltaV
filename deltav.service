@@ -3,6 +3,6 @@ Type=simple
 User=root
 Group=root
 Restart=on-failure
-ExecStart=/usr/local/bin/deltav/main.py
+ExecStart=/usr/local/bin/deltav/main.py 30 16 9 8 D21
 TimeoutStopSec=90
 RestartSec=10
