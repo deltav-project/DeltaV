@@ -24,7 +24,7 @@ class FrameResizer:
     def __init__(self, framerate: int, resized_w: int, resized_h: int):
         """Makes VideoCapture stream from /dev/capture-card, framerate is FPS, resized ints are pixels"""
 
-        self.device_path = "/dev/capture-card"  # Might be reused if first try to open video capture stream failed
+        self.device_path = "/dev/video0"  # Might be reused if first try to open video capture stream failed
 
         # Open video stream
         print("Opening video capture stream...")
@@ -94,7 +94,7 @@ class FrameResizer:
                     if duration_s != 0:  # Don't care about null duration resize
                         message = f"Estimate framerate: {1 / duration_s}fps /// Last frame duration: {duration_s}s"
                         print(message)
-                        logging.write(message)
+                        logging.write(message + "\n")
 
                     last_frame_handling = frame_handling_begin  # Only keep last frame resize timestamp to compare with next frame if framerate is logged
 
