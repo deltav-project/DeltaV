@@ -1,0 +1,7 @@
+KERNEL=="video[0-9]*",
+SUBSYSTEM=="video4linux",
+SUBSYSTEMS=="usb",
+ATTRS{idVendor}=="07ca",
+ATTRS{idProduct}=="1513",
+SYMLINK+="capture-card",
+RUN+="/usr/bin/systemctl start deltav.service"
