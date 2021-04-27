@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from frame import FrameResizer
+from deltav.frame import FrameResizer
 from sys import argv
 import board
 from neopixel import NeoPixel, GRB
