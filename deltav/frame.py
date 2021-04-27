@@ -25,6 +25,7 @@ class FrameResizer:
         """Makes VideoCapture stream from /dev/capture-card, framerate is FPS, resized ints are pixels"""
 
         self.device_path = "/dev/video0"  # Might be reused if first try to open video capture stream failed
+        self.running = False  # Wait for start_resize() call
 
         # Open video stream
         print("Opening video capture stream...")
@@ -85,7 +86,8 @@ class FrameResizer:
         last_frame_handling = time()  # First previous frame handling will have null duration
 
         with open("/home/deltav/logging.log", "a") as logging:
-            while True:
+            self.running = True
+            while self.running:
                 frame_handling_begin = time()
 
                 if framerate_logging:
@@ -113,3 +115,8 @@ class FrameResizer:
 
                 if self.limited_framerate and remaining_before_next > 0:  # Don't sleep if late for next frame
                     sleep(remaining_before_next)
+
+    def stop_resize(self):
+        """Stop resizing operation started with start_resize(), can be called even if no resizing is running"""
+
+        self.running = False

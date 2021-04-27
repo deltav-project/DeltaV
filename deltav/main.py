@@ -4,6 +4,7 @@ from frame import FrameResizer
 from sys import argv
 import board
 from neopixel import NeoPixel, GRB
+import signal
 
 
 # Framerate is second command line argument
@@ -55,4 +56,10 @@ with NeoPixel(pin_value, leds, pixel_order=GRB) as ledstrip:  # with statement e
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
 
     resizer = FrameResizer(framerate, width, height)
+
+    def stop(received_signal: int, _):
+        print(f"Stopped by signal {received_signal}")
+        resizer.stop_resize()
+
+    signal.signal(signal.SIGTERM, stop)  # Handle SIGTERM by systemd to stop resizing operations
     resizer.start_resize(update_ledstrip, framerate_logging)
