@@ -1,0 +1,8 @@
+[Service]
+Type=simple
+User=root
+Group=root
+Restart=on-failure
+ExecStart=/usr/local/bin/deltav.py
+TimeoutStopSec=90
+RestartSec=10
