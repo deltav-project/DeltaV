@@ -50,6 +50,7 @@ def do_nothing(borders):  # Don't do anything on resized frame
 
 pin_value = getattr(board, pin)  # Get pin variable from board module depending on pin id argument
 
+print("Connect to ledstrip...")
 with NeoPixel(pin_value, leds, pixel_order=GRB) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
 
