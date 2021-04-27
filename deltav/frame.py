@@ -21,14 +21,14 @@ def to_rgb(pixels_array):
 class FrameResizer:
     """Open a VideoCapture stream, then read and resize each frame, calls given handler for each received frame"""
 
-    def __init__(self, device_index: int, framerate: int, resized_w: int, resized_h: int):
-        """Makes VideoCapture stream from given /dev/ index, framerate is FPS, resized ints are pixels"""
+    def __init__(self, framerate: int, resized_w: int, resized_h: int):
+        """Makes VideoCapture stream from /dev/capture-card, framerate is FPS, resized ints are pixels"""
 
-        self.device_index = device_index  # Might be reused if first try to open video capture stream failed
+        self.device_path = "/dev/capture-card"  # Might be reused if first try to open video capture stream failed
 
         # Open video stream
         print("Opening video capture stream...")
-        self.stream = cv.VideoCapture(device_index)
+        self.stream = cv.VideoCapture(self.device_path)
 
         # Save video config
         self.framerate = framerate
@@ -50,7 +50,7 @@ class FrameResizer:
             tries += 1
             print(f"Opening video capture stream... Try {tries}")
 
-            self.stream.open(self.device_index)
+            self.stream.open(self.device_path)
 
         print("Video capture stream open.")
 
