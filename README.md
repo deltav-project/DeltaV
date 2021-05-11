@@ -1,10 +1,14 @@
 # DeltaV
 LED extend colored background for TV
 
-## DeltaV OpenCV Python
+## Install
 
-Current project try. OpenCV allows easy video processing, reading video capture from v4l2 without any issue.
+Run `sudo ./install.sh` from this repo directory.
 
-## DeltaV Processing
+## Run
 
-Abandoned try for Processing : unable to detect virtual camera.
+Auto launch at capture card connection / boot if capture card is already connected.
+
+Can be manually started with `sudo systemctl start deltav.service`.
+
+Type `sudo journalctl -u deltav` to check for service logs.
