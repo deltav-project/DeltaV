@@ -21,14 +21,15 @@ def to_rgb(pixels_array):
 class FrameResizer:
     """Open a VideoCapture stream, then read and resize each frame, calls given handler for each received frame"""
 
-    def __init__(self, device_index: int, framerate: int, resized_w: int, resized_h: int):
-        """Makes VideoCapture stream from given /dev/ index, framerate is FPS, resized ints are pixels"""
+    def __init__(self, framerate: int, resized_w: int, resized_h: int):
+        """Makes VideoCapture stream from /dev/capture-card, framerate is FPS, resized ints are pixels"""
 
-        self.device_index = device_index  # Might be reused if first try to open video capture stream failed
+        self.device_path = "/dev/video0"  # Might be reused if first try to open video capture stream failed
+        self.running = False  # Wait for start_resize() call
 
         # Open video stream
         print("Opening video capture stream...")
-        self.stream = cv.VideoCapture(device_index)
+        self.stream = cv.VideoCapture(self.device_path)
 
         # Save video config
         self.framerate = framerate
@@ -50,7 +51,7 @@ class FrameResizer:
             tries += 1
             print(f"Opening video capture stream... Try {tries}")
 
-            self.stream.open(self.device_index)
+            self.stream.open(self.device_path)
 
         print("Video capture stream open.")
 
@@ -84,29 +85,38 @@ class FrameResizer:
 
         last_frame_handling = time()  # First previous frame handling will have null duration
 
-        while True:
-            frame_handling_begin = time()
+        with open("/home/deltav/logging.log", "a") as logging:
+            self.running = True
+            while self.running:
+                frame_handling_begin = time()
 
-            if framerate_logging:
-                duration_s = frame_handling_begin - last_frame_handling  # Save difference in seconds between two frame resize operations
+                if framerate_logging:
+                    duration_s = frame_handling_begin - last_frame_handling  # Save difference in seconds between two frame resize operations
 
-                if duration_s != 0:  # Don't care about null duration resize
-                    print(f"Estimate framerate: {1 / duration_s}fps /// Last frame duration: {duration_s}s")
+                    if duration_s != 0:  # Don't care about null duration resize
+                        message = f"Estimate framerate: {1 / duration_s}fps /// Last frame duration: {duration_s}s"
+                        print(message)
+                        logging.write(message + "\n")
 
-                last_frame_handling = frame_handling_begin  # Only keep last frame resize timestamp to compare with next frame if framerate is logged
+                    last_frame_handling = frame_handling_begin  # Only keep last frame resize timestamp to compare with next frame if framerate is logged
 
-            valid, frame = self.stream.read()  # Read next frame, if successfully read
-            if not valid:  # Signal stopped, useless to continue reading next frames
-                print("No signal from video stream, stop resizing operations.")
-                break
+                valid, frame = self.stream.read()  # Read next frame, if successfully read
+                if not valid:  # Signal stopped, useless to continue reading next frames
+                    print("No signal from video stream, stop resizing operations.")
+                    break
 
-            resized_frame = cv.resize(frame, self.resized_frame_dims)  # Do resizing operation
-            resized_frame_borders = self.get_borders(resized_frame)  # Get borders algorithm
+                resized_frame = cv.resize(frame, self.resized_frame_dims)  # Do resizing operation
+                resized_frame_borders = self.get_borders(resized_frame)  # Get borders algorithm
 
-            on_frame(resized_frame_borders)
+                on_frame(resized_frame_borders)
 
-            frame_handling_duration = time() - frame_handling_begin  # Time took in seconds to handle current frame
-            remaining_before_next = self.frame_delay_s - frame_handling_duration  # Calculate remaing seconds before next frame
+                frame_handling_duration = time() - frame_handling_begin  # Time took in seconds to handle current frame
+                remaining_before_next = self.frame_delay_s - frame_handling_duration  # Calculate remaing seconds before next frame
 
-            if self.limited_framerate and remaining_before_next > 0:  # Don't sleep if late for next frame
-                sleep(remaining_before_next)
+                if self.limited_framerate and remaining_before_next > 0:  # Don't sleep if late for next frame
+                    sleep(remaining_before_next)
+
+    def stop_resize(self):
+        """Stop resizing operation started with start_resize(), can be called even if no resizing is running"""
+
+        self.running = False

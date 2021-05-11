@@ -1,0 +1,11 @@
+[Service]
+Type=simple
+User=root
+Group=root
+Restart=on-failure
+ExecStart=/usr/local/bin/deltav/main.py 30 16 9 16 D21
+TimeoutStopSec=90
+RestartSec=10
+
+[Unit]
+After=multi-user.target
