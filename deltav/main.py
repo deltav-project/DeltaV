@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -u
 
-from frame import FrameResizer
+from frame import FrameResizer, BrightnessFilter
 from sys import argv
 import board
 from neopixel import NeoPixel, GRB
@@ -54,6 +54,7 @@ pin_value = getattr(board, pin)  # Get pin variable from board module depending 
 print("Connect to ledstrip...")
 with NeoPixel(pin_value, leds, pixel_order=GRB) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
+    filter_pixels = BrightnessFilter(50, update_ledstrip)
 
     resizer = FrameResizer(framerate, width, height)
 
@@ -62,4 +63,4 @@ with NeoPixel(pin_value, leds, pixel_order=GRB) as ledstrip:  # with statement e
         resizer.stop_resize()
 
     signal.signal(signal.SIGTERM, stop)  # Handle SIGTERM by systemd to stop resizing operations
-    resizer.start_resize(update_ledstrip, framerate_logging)
+    resizer.start_resize(filter_pixels, framerate_logging)

@@ -120,3 +120,53 @@ class FrameResizer:
         """Stop resizing operation started with start_resize(), can be called even if no resizing is running"""
 
         self.running = False
+
+
+class BrightnessFilter:
+    """Callable object setting to black pixels which haven't a sufficiently high value inside
+    HSV format"""
+
+    def __init__(self, threshold: float, on_frame: "function"):
+        """threshold is the minimal Value (V) for a color to be kept, each convertion will result
+        into a new borders array passed as argument to on_frame callback (functional paradigm)
+        Note: threshold argument is expected to be a percentage."""
+
+        self.threshold = (threshold / 100) * 255  # V is a % but OpenCV stores it as a byte (0-255)
+        self.on_frame = on_frame
+
+    def filter(self, border):
+        """Image handling for a single pixels array"""
+
+        length = len(border)  # Number of pixels in current screen border
+
+        # Requires to have a 2D OpenCV image to make a cvtColor() call, creates a pixels line with
+        # 2D image which has border_length * 1 dimensions
+        border_image = np.zeros((1, length, 3), dtype=np.uint8)
+        for i in range(length):
+            border_image[0][i] = border[i]
+
+        # Converts from HSV to get pixel brightness with Value (V)
+        converted_image = cv.cvtColor(border_image, cv.COLOR_RGB2HSV)
+
+        # 2D images is converted back into a simple pixels array
+        new_border = np.zeros((length, 3), dtype=np.uint8)
+        for i in range(length):
+            pixel = converted_image[0][i]
+
+            # If pixel color is too dark, it will be transformed to black (0, 0, 0), else the same
+            # color is copied from original pixels array
+            if pixel[2] < self.threshold:
+                new_border[i] = np.zeros(3, dtype=np.uint8)
+            else:
+                new_border[i] = border[i]
+
+        return new_border
+
+    def __call__(self, borders):
+        """Suppresses dark pixels by settings them to black, then call on_frame callback with new
+        borders"""
+
+        (top, bottom, left, right) = borders
+
+        # Converts each border and use next image handling callback with them (functional paradigm)
+        self.on_frame((self.filter(top), self.filter(bottom), self.filter(left), self.filter(right)))
