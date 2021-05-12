@@ -17,6 +17,8 @@ height = int(argv[3])
 leds = int(argv[4])
 # Get pin id for plugged led strip
 pin = argv[5]
+# HSV V value in percentage to use as threshold for filter
+threshold = argv[6]
 
 framerate_logging = "--show-fps" in argv  # show-fps option enable framerate informations logging
 
@@ -54,7 +56,7 @@ pin_value = getattr(board, pin)  # Get pin variable from board module depending 
 print("Connect to ledstrip...")
 with NeoPixel(pin_value, leds, pixel_order=GRB) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
-    filter_pixels = BrightnessFilter(50, update_ledstrip)
+    filter_pixels = BrightnessFilter(threshold, update_ledstrip)
 
     resizer = FrameResizer(framerate, width, height)
 
