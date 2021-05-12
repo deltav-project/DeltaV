@@ -32,14 +32,30 @@ class LedstripUpdater:
     def __call__(self, borders):
         """Take top border from given arrays to adjust ledstrip LEDs, filling with black if required"""
 
+        left_array = borders[2]
         top_array = borders[0]
-        leds_to_color = min(len(top_array), self.ledstrip.n)  # Color LED while there is still LEDs and there is still pixel to show
+        right_array = borders[3]
+        bottom_array = borders[1]
 
-        for i in range(leds_to_color):
-            self.ledstrip[i] = top_array[i]
+        next_led = 0  # Next led to color inside ledstrip array
 
-        for i in range(leds_to_color, self.ledstrip.n):  # Color remaining LEDS (if any) in black
-            self.ledstrip[i] = (0, 0, 0)
+        self.ledstrip[next_led] = bottom_array[0]
+        next_led += 1
+
+        for i in range(len(left_array)):
+            self.ledstrip[next_led] = left_array[i]
+            next_led += 1
+
+        for i in range(len(top_array)):
+            self.ledstrip[next_led] = top_array[i]
+            next_led += 1
+
+        for i in range(len(right_array)):
+            self.ledstrip[next_led] = right_array[i]
+            next_led += 1
+
+        self.ledstrip[next_led] = bottom_array[len(bottom_array) - 1]
+        next_led += 1
 
 
 def print_borders(borders):  # Prints resized frame borders
