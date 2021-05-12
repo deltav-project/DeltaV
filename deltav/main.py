@@ -18,7 +18,7 @@ leds = int(argv[4])
 # Get pin id for plugged led strip
 pin = argv[5]
 # HSV V value in percentage to use as threshold for filter
-threshold = argv[6]
+threshold = float(argv[6])
 
 framerate_logging = "--show-fps" in argv  # show-fps option enable framerate informations logging
 
