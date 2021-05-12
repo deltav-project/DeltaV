@@ -158,7 +158,13 @@ class BrightnessFilter:
             if pixel[2] < self.threshold:
                 new_border[i] = np.zeros(3, dtype=np.uint8)
             else:
-                new_border[i] = border[i]
+                pixel_image = np.zeros((1, 1, 3), dtype=np.uint8)
+
+                pixel_image[0][0][0] = pixel[0]
+                pixel_image[0][0][1] = max(50, pixel[1])
+                pixel_image[0][0][2] = pixel[2]
+
+                new_border[i] = cv.cvtColor(pixel_image, cv.COLOR_HSV2RGB)[0][0]
 
         return new_border
 
