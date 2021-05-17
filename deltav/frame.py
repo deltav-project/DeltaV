@@ -126,6 +126,15 @@ class ColorsFilter:
     """Callable object setting to black pixels which haven't a sufficiently high value inside
     HSV format depending on pixel's hue, and setting a minimal saturation of 50 %"""
 
+    greenMinH = 75 // 2
+    greenMaxH = 135 // 2
+
+    @staticmethod
+    def is_green(pixel) -> bool:
+        h = pixel[0]
+
+        return ColorsFilter.greenMinH <= h <= ColorsFilter.greenMaxH
+
     def __init__(self, threshold: float, on_frame: "function"):
         """threshold is the minimal Value (V) for a color to be kept, each convertion will result
         into a new borders array passed as argument to on_frame callback (functional paradigm)
@@ -153,9 +162,14 @@ class ColorsFilter:
         for i in range(length):
             pixel = converted_image[0][i]
 
+            current_threshold = self.threshold
+            # Brightness requirements is less high for green colors, forest are dark
+            if ColorsFilter.is_green(pixel):
+                current_threshold /= 2
+
             # If pixel color is too dark, it will be transformed to black (0, 0, 0), else the same
             # color is copied from original pixels array
-            if pixel[2] < self.threshold:
+            if pixel[2] < current_threshold:
                 new_border[i] = np.zeros(3, dtype=np.uint8)
             else:
                 pixel_image = np.zeros((1, 1, 3), dtype=np.uint8)
