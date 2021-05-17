@@ -122,9 +122,9 @@ class FrameResizer:
         self.running = False
 
 
-class BrightnessFilter:
+class ColorsFilter:
     """Callable object setting to black pixels which haven't a sufficiently high value inside
-    HSV format"""
+    HSV format depending on pixel's hue, and setting a minimal saturation of 50 %"""
 
     def __init__(self, threshold: float, on_frame: "function"):
         """threshold is the minimal Value (V) for a color to be kept, each convertion will result
@@ -160,8 +160,9 @@ class BrightnessFilter:
             else:
                 pixel_image = np.zeros((1, 1, 3), dtype=np.uint8)
 
+                # Filtering each H, S and V values for displayed pixel
                 pixel_image[0][0][0] = pixel[0]
-                pixel_image[0][0][1] = max(50, pixel[1])
+                pixel_image[0][0][1] = max(50, pixel[1])  # Minimal saturation is 50 % to avoid having too much white LEDs
                 pixel_image[0][0][2] = pixel[2]
 
                 new_border[i] = cv.cvtColor(pixel_image, cv.COLOR_HSV2RGB)[0][0]
