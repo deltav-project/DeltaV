@@ -122,9 +122,18 @@ class FrameResizer:
         self.running = False
 
 
-class BrightnessFilter:
+class ColorsFilter:
     """Callable object setting to black pixels which haven't a sufficiently high value inside
-    HSV format"""
+    HSV format depending on pixel's hue, and setting a minimal saturation of 50 %"""
+
+    greenMinH = 75 // 2
+    greenMaxH = 135 // 2
+
+    @staticmethod
+    def is_green(pixel) -> bool:
+        h = pixel[0]
+
+        return ColorsFilter.greenMinH <= h <= ColorsFilter.greenMaxH
 
     def __init__(self, threshold: float, on_frame: "function"):
         """threshold is the minimal Value (V) for a color to be kept, each convertion will result
@@ -153,12 +162,24 @@ class BrightnessFilter:
         for i in range(length):
             pixel = converted_image[0][i]
 
+            current_threshold = self.threshold
+            # Brightness requirements is less high for green colors, forest are dark
+            if ColorsFilter.is_green(pixel):
+                current_threshold /= 2
+
             # If pixel color is too dark, it will be transformed to black (0, 0, 0), else the same
             # color is copied from original pixels array
-            if pixel[2] < self.threshold:
+            if pixel[2] < current_threshold:
                 new_border[i] = np.zeros(3, dtype=np.uint8)
             else:
-                new_border[i] = border[i]
+                pixel_image = np.zeros((1, 1, 3), dtype=np.uint8)
+
+                # Filtering each H, S and V values for displayed pixel
+                pixel_image[0][0][0] = pixel[0]
+                pixel_image[0][0][1] = max(50, pixel[1])  # Minimal saturation is 50 % to avoid having too much white LEDs
+                pixel_image[0][0][2] = pixel[2]
+
+                new_border[i] = cv.cvtColor(pixel_image, cv.COLOR_HSV2RGB)[0][0]
 
         return new_border
 

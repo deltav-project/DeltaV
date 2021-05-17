@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -u
 
-from frame import FrameResizer, BrightnessFilter
+from frame import FrameResizer, ColorsFilter
 from sys import argv
 import board
 from neopixel import NeoPixel, GRB
@@ -28,6 +28,20 @@ class LedstripUpdater:
 
     def __init__(self, ledstrip: NeoPixel):
         self.ledstrip = ledstrip
+        self.next_led = 0  # Will go from 0 to ledstrip.n, then go back to 0
+
+    def showSegment(self, pixels_array):
+        """Increases next_led of given pixels array length and color these LEDs with given color codes"""
+
+        for i in range(len(pixels_array)):
+            # Colors next LED inside ledstrip
+            self.ledstrip[self.next_led] = pixels_array[i]
+            # Go to next LED
+            self.next_led += 1
+
+            # If all LEDs were colored, go back to the beginning of the ledstrip
+            if self.next_led == self.ledstrip.n:
+                self.next_led = 0
 
     def __call__(self, borders):
         """Take top border from given arrays to adjust ledstrip LEDs, filling with black if required"""
@@ -37,25 +51,15 @@ class LedstripUpdater:
         right_array = borders[3]
         bottom_array = borders[1]
 
-        next_led = 0  # Next led to color inside ledstrip array
+        bot_len = len(bottom_array)
 
-        self.ledstrip[next_led] = bottom_array[0]
-        next_led += 1
+        self.showSegment(bottom_array[:1])
+        self.showSegment(left_array)
+        self.showSegment(top_array)
+        self.showSegment(right_array)
+        self.showSegment(bottom_array[bot_len-1:bot_len])
 
-        for i in range(len(left_array)):
-            self.ledstrip[next_led] = left_array[i]
-            next_led += 1
-
-        for i in range(len(top_array)):
-            self.ledstrip[next_led] = top_array[i]
-            next_led += 1
-
-        for i in range(len(right_array)):
-            self.ledstrip[next_led] = right_array[i]
-            next_led += 1
-
-        self.ledstrip[next_led] = bottom_array[len(bottom_array) - 1]
-        next_led += 1
+        self.ledstrip.show()
 
 
 def print_borders(borders):  # Prints resized frame borders
@@ -70,9 +74,9 @@ def do_nothing(borders):  # Don't do anything on resized frame
 pin_value = getattr(board, pin)  # Get pin variable from board module depending on pin id argument
 
 print("Connect to ledstrip...")
-with NeoPixel(pin_value, leds, pixel_order=GRB) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
+with NeoPixel(pin_value, leds, pixel_order=GRB, auto_write=False) as ledstrip:  # with statement ensures ledstrip is clean when program stops (SIGKILL case unhandled)
     update_ledstrip = LedstripUpdater(ledstrip)  # Generate function for ledstirp updating from callable class with __call__()
-    filter_pixels = BrightnessFilter(threshold, update_ledstrip)
+    filter_pixels = ColorsFilter(threshold, update_ledstrip)
 
     resizer = FrameResizer(framerate, width, height)
 
