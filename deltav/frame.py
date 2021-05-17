@@ -24,7 +24,8 @@ class FrameResizer:
     def __init__(self, framerate: int, resized_w: int, resized_h: int):
         """Makes VideoCapture stream from /dev/capture-card, framerate is FPS, resized ints are pixels"""
 
-        self.device_path = "/dev/video0"  # Might be reused if first try to open video capture stream failed
+        # Might be reused if first try to open video capture stream failed
+        self.device_path = "/dev/v4l/by-id/usb-AVerMedia_Technologies__Inc._Live_Gamer_Portable_2_Plus_1311774501574-video-index0"
         self.running = False  # Wait for start_resize() call
 
         # Open video stream

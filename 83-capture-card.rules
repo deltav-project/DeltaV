@@ -3,5 +3,4 @@ SUBSYSTEM=="video4linux",
 SUBSYSTEM=="usb",
 ATTR{idVendor}=="07ca",
 ATTR{idProduct}=="1513",
-SYMLINK+="capture-card",
 ENV{SYSTEMD_WANTS}+="deltav.service"
