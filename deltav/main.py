@@ -30,12 +30,17 @@ class LedstripUpdater:
         self.ledstrip = ledstrip
         self.next_led = 0  # Will go from 0 to ledstrip.n, then go back to 0
 
-    def showSegment(self, pixels_array):
+    def showSegment(self, pixels_array, reverse_order=False):
         """Increases next_led of given pixels array length and color these LEDs with given color codes"""
 
-        for i in range(len(pixels_array)):
+        pixels_count = len(pixels_array)
+
+        for i in range(pixels_count):
+            # Next pixel to display depending on iteration direction
+            pixel_i = i if not reverse_order else pixels_count - i - 1
+
             # Colors next LED inside ledstrip
-            self.ledstrip[self.next_led] = pixels_array[i]
+            self.ledstrip[self.next_led] = pixels_array[pixel_i]
             # Go to next LED
             self.next_led += 1
 
@@ -54,7 +59,7 @@ class LedstripUpdater:
         bot_len = len(bottom_array)
 
         self.showSegment(bottom_array[:1])
-        self.showSegment(left_array)
+        self.showSegment(left_array, reverse_order=True)
         self.showSegment(top_array)
         self.showSegment(right_array)
         self.showSegment(bottom_array[bot_len-1:bot_len])
