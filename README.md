@@ -1,5 +1,5 @@
 # DeltaV
-LED extend colored background for TV
+LED extend colored background for TV.
 
 ## Hardware used
 
